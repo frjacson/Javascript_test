@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // 太离谱了  注意return Promise.resolve()这种写法，不知道怎么运行的。。。
+    Promise.resolve().then(() => {
+      console.log(1);
+      // return Promise.resolve(4);
+      return Promise.resolve(4);
+    }).then((res) => {
+      console.log(res)
+    })
+    new Promise((resolve, reject) => {
+      console.log(0);
+      resolve(2);
+    }).then(res => {
+      console.log(res);
+    }).then(() => {
+      console.log(3);
+    }).then(() => {
+      console.log(5);
+    }).then(() => {
+      console.log(6);
+    })
+  </script> 
+</body>
+</html>
