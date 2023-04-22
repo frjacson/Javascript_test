@@ -18,25 +18,25 @@ function compile(vm) {
   var el = document.querySelector(vm.$el);
   var documentFragment = document.createDocumentFragment(); // 创建一个空的文档碎片
   var reg = /\{\{(.*)\}\}/; //匹配{{}}
-  while(el.childNodes[0]) {
+  while (el.childNodes[0]) {
     var child = el.childNodes[0]; // 将第一个子节点存储到child
-    if(child.nodeType == 1) {
+    if (child.nodeType == 1) {
       // 如果能进入到if，说明该节点是一个元素节点
-      for(var key in child.attributes) {
+      for (var key in child.attributes) {
         // 遍历该元素节点的每一个属性，拿到的是 type="text" v-model="msg"
         var attrName = child.attributes[key].nodeName;
-        if(attrName === 'v-model') {
+        if (attrName === "v-model") {
           var vmKey = child.attributes[key].nodeValue;
-          child.addEventListener('input', function(event) {
+          child.addEventListener("input", function (event) {
             // 获取用户输入的值，然后改变 vm 里面的 msg 属性对应的值，注意这里会触发 setter
             vm[vmKey] = event.target.value;
-          })
+          });
         }
       }
     }
-    if(child.nodeType == 3) {
+    if (child.nodeType == 3) {
       // 如果能进到这个if，说明节点是文本节点
-      if(reg.test(child.nodeValue)) {
+      if (reg.test(child.nodeValue)) {
         var vmKey = RegExp.$1; // 获取正则里面的捕获值，也就是msg
         // 实力话一个Watcher(订阅者), 接受三个参数,Vue, 文本节点，捕获值
         new Watcher(vm, child, vmKey);
@@ -59,12 +59,12 @@ Dep.prototype = {
   addSub: function (sub) {
     this.subs.push(sub);
   },
-  notify: function() {
+  notify: function () {
     this.subs.forEach(function (sub) {
       sub.update();
-    })
-  }
-}
+    });
+  },
+};
 
 // 新建观察者/订阅者Wather构造函数
 function Watcher(vm, child, vmKey) {
@@ -72,16 +72,16 @@ function Watcher(vm, child, vmKey) {
   this.child = child;
   this.vmKey = vmKey;
   Dep.target = this; // 将观察者实例对象添加给Dep.target
-  this.update();
+  this.update(); // 目的是为了触发函数
   Dep.target = null;
 }
 Watcher.prototype = {
   // 相当于：{{ msg }}.nodeValue = this.vm['msg']
   // 这样就更新了文本节点的值，由于这里在获取 vm.msg，所以会触发 getter
-  update: function() {
+  update: function () {
     this.child.nodeValue = this.vm[this.vmKey];
-  }
-}
+  },
+};
 
 // 数据侦听
 function observer(vm, obj) {
@@ -93,17 +93,17 @@ function observer(vm, obj) {
     // 在获取数据时触发 getter，在设置数据时触发 setter
     Object.defineProperties(vm, key, {
       get() {
-        console.log("触发 getter")
-        if(Dep.target) {
+        console.log("触发 getter");
+        if (Dep.target) {
           dep.addSub(Dep.target); // 往发布者的数组里面添加订阅者
         }
         return obj[key];
       },
       set(newVal) {
-        console.log("触发 setter")
+        console.log("触发 setter");
         obj[key] = newVal;
         dep.notify(); // 发布者发出消息，通知订阅者修改了数据
-      }
-    })
+      },
+    });
   }
 }
